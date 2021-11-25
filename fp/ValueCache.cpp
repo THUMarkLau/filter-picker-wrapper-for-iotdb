@@ -33,3 +33,16 @@ int64_t ValueCache::get(int32_t index) const {
 int32_t ValueCache::size() const {
     return this->currentCount;
 }
+
+ValueCache *ValueCacheManager::getValueCache(std::string deviceId, std::string channel) {
+    auto iterator = cacheMap.find(deviceId + "." + channel);
+    ValueCache* result = nullptr;
+    if (iterator != cacheMap.end()) {
+        result = iterator->second;
+    } else {
+        result = new ValueCache();
+        cacheMap.insert(std::make_pair(deviceId + "." + channel, result));
+    }
+    assert(result != nullptr);
+    return result;
+}

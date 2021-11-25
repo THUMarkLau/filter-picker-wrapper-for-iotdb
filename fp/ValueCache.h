@@ -9,28 +9,22 @@
 #include <cstdint>
 #include <cassert>
 #include <cstring>
+#include <unordered_map>
 
 class ValueCache {
 private:
-    ValueCache(): currentCount(0), cache(nullptr){
-        cache = new int64_t[CACHE_SIZE];
-    };
-    static ValueCache* instance;
     int32_t currentCount;
     int64_t *cache;
 public:
     const static int32_t CACHE_SIZE = 2048;
 public:
+    ValueCache(): currentCount(0), cache(nullptr){
+        cache = new int64_t[CACHE_SIZE];
+    };
     ValueCache(ValueCache&)=delete;
     ValueCache& operator=(const ValueCache&)=delete;
     ~ValueCache(){
         // TODO: release the cache buffer
-    }
-    static ValueCache* getInstance() {
-        if (instance == nullptr) {
-            instance = new ValueCache();
-        }
-        return instance;
     }
 
     void add(int64_t *data, int length);
@@ -38,5 +32,26 @@ public:
     int32_t size() const;
 };
 
+class ValueCacheManager {
+private:
+    ValueCacheManager() {}
+    static ValueCacheManager* instance;
+    std::unordered_map<std::string, ValueCache*> cacheMap;
+public:
+    ValueCacheManager(ValueCacheManager&)=delete;
+    ValueCacheManager& operator=(const ValueCacheManager&)=delete;
+    ~ValueCacheManager(){
+        // release all cache
+    }
+
+    static ValueCacheManager* getInstance() {
+        if (instance == nullptr) {
+            instance = new ValueCacheManager();
+        }
+        return instance;
+    }
+
+    ValueCache* getValueCache(std::string deviceId, std::string channel);
+};
 
 #endif //FILTERPICKER_VALUECACHE_H

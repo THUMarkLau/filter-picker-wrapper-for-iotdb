@@ -47,7 +47,7 @@ public:
 
     void processResult(std::string deviceId, std::string channel, PickData** pickList, int listLength);
 
-    int64_t searchFromCache(int index);
+    int64_t searchFromCache(std::string deviceId, std::string channel, int index);
 };
 
 float* int2float(int32_t*);

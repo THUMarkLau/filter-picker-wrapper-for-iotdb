@@ -41,7 +41,8 @@ void FilterPickerWrapper::pick(DataMessage *message) {
              &resultList, &pickNum, "TEST");
         processResult(message->deviceId, message->channel, resultList, pickNum);
     }
-    ValueCache::getInstance()->add(getTimeArray(message->startTime, (int32_t) (dt * 1000), PROCESS_NUM), PROCESS_NUM);
+    ValueCache* valueCache = ValueCacheManager::getInstance()->getValueCache(message->deviceId, message->channel);
+    valueCache->add(getTimeArray(message->startTime, (int32_t) (dt * 1000), PROCESS_NUM), PROCESS_NUM);
 }
 
 void
@@ -64,8 +65,8 @@ FilterPickerWrapper::processResult(std::string deviceId, std::string channel, Pi
     }
 }
 
-int64_t FilterPickerWrapper::searchFromCache(int index) {
-    ValueCache *cache = ValueCache::getInstance();
+int64_t FilterPickerWrapper::searchFromCache(std::string deviceId, std::string channel, int index) {
+    ValueCache *cache = ValueCacheManager::getInstance()->getValueCache(deviceId, channel);
     int64_t result = 0;
     if (index + cache->size() < 0) {
         // data item is not cached in ValueCache
