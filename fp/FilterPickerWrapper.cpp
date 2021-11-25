@@ -29,12 +29,11 @@ void FilterPickerWrapper::pick(DataMessage *message) {
     FilterPicker5_Memory *mem = nullptr;
     PickData **resultList = NULL;
     int pickNum = 0;
-    int32_t *values = message->values;
-    ValueBuffer* valueBuffer = ValueBuffer::getInstance();
-    valueBuffer->add(message->deviceId, message->channel, int2float(message->values), message->startTime);
+    ValueBufferManager* valueBufferManager = ValueBufferManager::getInstance();
+    ValueBufferManager::getInstance()->add(message->deviceId, message->channel, int2float(message->values), message->startTime);
     float *toPickedData = nullptr;
     int64_t startTime = -1;
-    valueBuffer->getIfEnough(message->deviceId, message->channel, &toPickedData, &startTime);
+    valueBufferManager->getIfEnough(message->deviceId, message->channel, &toPickedData, &startTime);
     if (toPickedData != nullptr) {
         Pick(dt, toPickedData, PROCESS_NUM, filterWindow, longTermWindow, threshold1, threshold2, tUpEvent, &mem,
              useMemory,
@@ -52,7 +51,7 @@ FilterPickerWrapper::processResult(std::string deviceId, std::string channel, Pi
         int index = (int) ((pickData->indices[0] + pickData->indices[1]) / 2.0);
         if (index < 0) {
             // index is less than 0 means earthquakes occurs in history data
-            int64_t timestamp = searchFromCache(index);
+            int64_t timestamp = searchFromCache(deviceId, channel, index);
             if (timestamp < 0) {
                 // cannot search result from history
                 std::cout << "Cannot get data from cache, index is " << index << std::endl;
@@ -75,4 +74,14 @@ int64_t FilterPickerWrapper::searchFromCache(std::string deviceId, std::string c
         result = cache->get(index + cache->size());
     }
     return result;
+}
+
+float* int2float(int32_t*) {
+    // TODO: fill it
+    return nullptr;
+}
+
+int64_t* getTimeArray(int64_t startTime, int64_t dt, int32_t count) {
+    // TODO: fill it
+    return nullptr;
 }
