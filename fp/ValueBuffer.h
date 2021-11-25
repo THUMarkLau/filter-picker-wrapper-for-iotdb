@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <string>
 #include <cassert>
+#include <cstring>
 #include <unordered_map>
 
 class ValueBufferManager;
@@ -17,11 +18,15 @@ class ValueBuffer {
 private:
     int32_t currentCount;
     float* dataBuffer;
+    int64_t startTime;
 protected:
-    ValueBuffer():currentCount(0) {};
+    ValueBuffer():currentCount(0), startTime(-1) {
+        dataBuffer = new float[MAX_SIZE];
+    };
 public:
+    const int32_t MAX_SIZE = 256;
     static const int32_t TARGET_SIZE = 100;
-    void add(float* data, int64_t startTime);
+    void add(float* data, int64_t startTime, int32_t length);
     void getIfEnough(float** dataDst, int64_t* startTimeDst);
     friend ValueBufferManager;
 };
@@ -44,7 +49,7 @@ public:
         return instance;
     }
 
-    void add(const std::string& deviceId, const std::string& channel, float* data, int64_t startTime);
+    void add(const std::string& deviceId, const std::string& channel, float* data, int64_t startTime, int32_t length);
 
     void getIfEnough(const std::string& deviceId, const std::string& channel, float** dataDst, int64_t* startTimeDst);
 };

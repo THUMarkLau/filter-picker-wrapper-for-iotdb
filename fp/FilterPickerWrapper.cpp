@@ -30,7 +30,7 @@ void FilterPickerWrapper::pick(DataMessage *message) {
     PickData **resultList = NULL;
     int pickNum = 0;
     ValueBufferManager* valueBufferManager = ValueBufferManager::getInstance();
-    ValueBufferManager::getInstance()->add(message->deviceId, message->channel, int2float(message->values), message->startTime);
+    ValueBufferManager::getInstance()->add(message->deviceId, message->channel, int2float(message->values, message->length), message->startTime, message->length);
     float *toPickedData = nullptr;
     int64_t startTime = -1;
     valueBufferManager->getIfEnough(message->deviceId, message->channel, &toPickedData, &startTime);
@@ -76,12 +76,21 @@ int64_t FilterPickerWrapper::searchFromCache(std::string deviceId, std::string c
     return result;
 }
 
-float* int2float(int32_t*) {
-    // TODO: fill it
+float* int2float(int32_t* data, int32_t length) {
+    assert(length > 0);
+    float* result = new float[length];
+    for(int i = 0; i < length; ++i) {
+        result[i] = (float)data[i];
+    }
     return nullptr;
 }
 
 int64_t* getTimeArray(int64_t startTime, int64_t dt, int32_t count) {
-    // TODO: fill it
-    return nullptr;
+    assert(count > 0);
+    int64_t * result = new int64_t[count];
+    for(int64_t i = 0; i < count; ++i) {
+        // Can we visit array using int64_t ?
+        result[i] = startTime + dt * i;
+    }
+    return result;
 }

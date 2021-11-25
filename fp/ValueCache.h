@@ -35,8 +35,8 @@ public:
 class ValueCacheManager {
 private:
     ValueCacheManager() {}
-    static ValueCacheManager* instance;
     std::unordered_map<std::string, ValueCache*> cacheMap;
+    static ValueCacheManager* instance;
 public:
     ValueCacheManager(ValueCacheManager&)=delete;
     ValueCacheManager& operator=(const ValueCacheManager&)=delete;

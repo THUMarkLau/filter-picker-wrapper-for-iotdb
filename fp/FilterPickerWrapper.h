@@ -50,7 +50,7 @@ public:
     int64_t searchFromCache(std::string deviceId, std::string channel, int index);
 };
 
-float* int2float(int32_t*);
+float* int2float(int32_t* data, int32_t length);
 
 int64_t* getTimeArray(int64_t startTime, int64_t dt, int32_t count);
 

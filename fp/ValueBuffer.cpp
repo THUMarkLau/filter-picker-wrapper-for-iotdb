@@ -4,7 +4,9 @@
 
 #include "ValueBuffer.h"
 
-void ValueBufferManager::add(const std::string &deviceId, const std::string &channel, float *data, int64_t startTime) {
+ValueBufferManager* ValueBufferManager::instance = nullptr;
+
+void ValueBufferManager::add(const std::string &deviceId, const std::string &channel, float *data, int64_t startTime, int32_t length) {
     auto valueBufferIterator = bufferMap.find(deviceId + "." + channel);
     ValueBuffer *buffer = nullptr;
     if (valueBufferIterator != bufferMap.end()) {
@@ -14,7 +16,7 @@ void ValueBufferManager::add(const std::string &deviceId, const std::string &cha
         bufferMap.insert(std::make_pair(deviceId + "." + channel, buffer));
     }
     assert(buffer != nullptr);
-    buffer->add(data, startTime);
+    buffer->add(data, startTime, length);
 }
 
 void
@@ -31,10 +33,32 @@ ValueBufferManager::getIfEnough(const std::string &deviceId, const std::string &
     }
 }
 
-void ValueBuffer::add(float *data, int64_t startTime) {
-    // TODO: fill it
+void ValueBuffer::add(float *data, int64_t startTime, int32_t length) {
+    assert(length > 0);
+    assert(currentCount + length <= MAX_SIZE);
+    std::memcpy(dataBuffer + currentCount, data, length);
+    currentCount += length;
+    if (this->startTime == 0) {
+        this->startTime = startTime;
+    }
 }
 
 void ValueBuffer::getIfEnough(float **dataDst, int64_t *startTimeDst) {
-    // TODO: fill it
+    assert(dataDst != nullptr);
+    assert(startTimeDst != nullptr);
+    if (currentCount >= 100) {
+        std::memset(*dataDst, 0, 100 * sizeof(float));
+        std::memcpy(*dataDst, dataBuffer, 100 * sizeof(float));
+        *startTimeDst = startTime;
+        // this.startTime increase 10 * 100 milliseconds
+        this->startTime = startTime + 10 * 100;
+        // move the left data forward
+        for(int i = 0; i < currentCount - 100; ++i) {
+            dataBuffer[i] = dataBuffer[i + 100];
+        }
+        currentCount -= 100;
+    } else {
+        *dataDst = nullptr;
+        *startTimeDst = -1;
+    }
 }

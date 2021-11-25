@@ -4,8 +4,9 @@
 
 #include "ValueCache.h"
 
+ValueCacheManager* ValueCacheManager::instance = nullptr;
+
 void ValueCache::add(int64_t *data, int length) {
-    // TODO: separate cache for each timeseries
     assert(length == 100);
     if (currentCount + length > CACHE_SIZE) {
         // if we add the new data to cache, the total size is larger than max size
